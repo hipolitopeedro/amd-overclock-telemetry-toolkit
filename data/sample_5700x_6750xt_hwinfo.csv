@@ -1,0 +1,5 @@
+cpu_tctl_tdie_c,cpu_ppt_w,cpu_tdc_a,cpu_edc_a,cpu_vcore_svi2_v,core0_clock_mhz,core0_eff_mhz,core1_clock_mhz,core1_eff_mhz,core2_clock_mhz,core2_eff_mhz,core3_clock_mhz,core3_eff_mhz,core4_clock_mhz,core4_eff_mhz,core5_clock_mhz,core5_eff_mhz,core6_clock_mhz,core6_eff_mhz,core7_clock_mhz,core7_eff_mhz,gpu_clock_mhz,gpu_vram_mhz,gpu_edge_temp_c,gpu_hotspot_temp_c,gpu_asic_power_w,whea_total_errors
+41.5,28.4,18.0,35.0,1.025,3600,850,3600,620,4650,4648,3600,510,3600,480,3600,490,3600,520,3600,500,2550,2250,58.0,74.0,185.0,0
+68.2,88.5,60.2,115.0,1.262,4550,4545,4550,4542,4600,4596,4550,4544,4525,4520,4525,4518,4525,4521,4525,4519,2645,2312,64.0,83.0,210.0,0
+74.8,95.0,64.8,128.0,1.281,4625,4620,4625,4618,4650,4645,4625,4621,4600,4595,4600,4594,4600,4596,4600,4593,2660,2312,66.0,86.0,218.0,0
+76.1,98.2,66.5,132.0,1.275,4600,4594,4600,4592,4650,4644,4600,4595,4575,4570,4575,4568,4575,4571,4575,4569,2655,2312,67.0,87.5,220.0,0
