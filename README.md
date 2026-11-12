@@ -4,6 +4,8 @@
 ![PowerShell](https://img.shields.io/badge/PowerShell-5391FE?style=for-the-badge&logo=powershell&logoColor=white)
 ![AMD](https://img.shields.io/badge/AMD-Ryzen_%26_Radeon-ED1C24?style=for-the-badge&logo=amd&logoColor=white)
 
+> **Live Interactive DDR4/DDR5, WHEA & Telemetry Dashboard (GitHub Pages):** [https://hipolitopeedro.github.io/amd-overclock-telemetry-toolkit/](https://hipolitopeedro.github.io/amd-overclock-telemetry-toolkit/)
+>
 > **English:** Unified hardware diagnostics, telemetry analysis, and overclocking/undervolting stability toolkit designed for **AMD Ryzen platforms (AM4 Zen 3 & AM5 Zen 4 / Zen 5, 6-core to 16-core, including X3D)**, **AMD Radeon GPUs (RDNA 2 / RDNA 3)**, and **DDR4 / DDR5 Memory Overclocking**.
 >
 > **Português:** Kit unificado de diagnóstico de hardware, análise de telemetria e validação de estabilidade de Overclock/Undervolt desenvolvido para **plataformas AMD Ryzen (AM4 Zen 3 e AM5 Zen 4 / Zen 5, de 6 a 16 núcleos, incluindo X3D)**, **placas AMD Radeon (RDNA 2 / RDNA 3)** e **Overclock de Memória DDR4 / DDR5**.

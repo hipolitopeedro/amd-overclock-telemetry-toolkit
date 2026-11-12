@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AMD Overclocking, Undervolting & Hardware Telemetry Toolkit</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body { background-color: #090d16; color: #e2e8f0; font-family: ui-sans-serif, system-ui, -apple-system, sans-serif; }
+    .card { background-color: #131926; border: 1px solid #232d42; border-radius: 0.75rem; }
+  </style>
+</head>
+<body class="min-h-screen pb-16">
+  <header class="border-b border-slate-800 bg-[#0d121c] sticky top-0 z-20">
+    <div class="max-w-7xl mx-auto px-4 py-4 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+      <div>
+        <div class="flex items-center gap-2">
+          <span class="px-2.5 py-0.5 text-xs font-bold uppercase tracking-wider bg-red-600 text-white rounded">AMD Ryzen & Radeon</span>
+          <span class="text-xs text-slate-400 font-mono">AM4 (DDR4) & AM5 (DDR5) • Clock Stretching • RDNA Hotspot • WHEA Decoder</span>
+        </div>
+        <h1 class="text-xl md:text-2xl font-bold text-white mt-1">AMD Overclocking, Undervolting & Hardware Telemetry Toolkit</h1>
+      </div>
+      <a href="https://github.com/hipolitopeedro/amd-overclock-telemetry-toolkit" target="_blank" class="px-3 py-1.5 text-xs font-semibold rounded border border-slate-700 hover:bg-slate-800 text-slate-200 transition">
+        Ver Código no GitHub
+      </a>
+    </div>
+  </header>
+
+  <main class="max-w-7xl mx-auto px-4 mt-6 space-y-8">
+    <!-- DDR4 / DDR5 Memory Timing & FCLK/UCLK Calculator -->
+    <section class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+      <div class="card p-5 lg:col-span-5 space-y-4">
+        <div class="border-b border-slate-800 pb-3 flex items-center justify-between">
+          <div>
+            <span class="text-xs font-mono text-red-400 uppercase">Subsistema de Memória</span>
+            <h2 class="text-base font-bold text-white mt-0.5">1. Calculadora DDR4 / DDR5 & Sincronia FCLK/UCLK</h2>
+          </div>
+          <div class="flex gap-1">
+            <button onclick="setRamPreset('ddr4')" class="px-2 py-1 text-xs rounded bg-slate-800 hover:bg-slate-700 text-slate-200 font-mono">AM4 3200 CL16</button>
+            <button onclick="setRamPreset('ddr5')" class="px-2 py-1 text-xs rounded bg-slate-800 hover:bg-slate-700 text-slate-200 font-mono">AM5 6000 CL30</button>
+          </div>
+        </div>
+
+        <div class="space-y-3 text-sm">
+          <div class="grid grid-cols-3 gap-2">
+            <div>
+              <label class="text-xs text-slate-400">Geração</label>
+              <select id="ramGen" onchange="calcRam()" class="w-full mt-1 bg-slate-900 border border-slate-700 rounded px-2 py-1.5 text-white font-mono">
+                <option value="ddr4" selected>DDR4 (AM4)</option>
+                <option value="ddr5">DDR5 (AM5)</option>
+              </select>
+            </div>
+            <div>
+              <label class="text-xs text-slate-400">Velocidade (MT/s)</label>
+              <input type="number" step="200" id="ramMts" value="3200" oninput="calcRam()" class="w-full mt-1 bg-slate-900 border border-slate-700 rounded px-2 py-1.5 text-white font-mono" />
+            </div>
+            <div>
+              <label class="text-xs text-slate-400">FCLK (MHz)</label>
+              <input type="number" step="33" id="ramFclk" value="1600" oninput="calcRam()" class="w-full mt-1 bg-slate-900 border border-slate-700 rounded px-2 py-1.5 text-white font-mono" />
+            </div>
+          </div>
+
+          <div class="grid grid-cols-3 gap-2">
+            <div>
+              <label class="text-xs text-slate-400">tCL (CAS)</label>
+              <input type="number" id="tCL" value="16" oninput="calcRam()" class="w-full mt-1 bg-slate-900 border border-slate-700 rounded px-2 py-1.5 text-white font-mono" />
+            </div>
+            <div>
+              <label class="text-xs text-slate-400">tRCDRD</label>
+              <input type="number" id="tRCD" value="18" oninput="calcRam()" class="w-full mt-1 bg-slate-900 border border-slate-700 rounded px-2 py-1.5 text-white font-mono" />
+            </div>
+            <div>
+              <label class="text-xs text-slate-400">tRP</label>
+              <input type="number" id="tRP" value="18" oninput="calcRam()" class="w-full mt-1 bg-slate-900 border border-slate-700 rounded px-2 py-1.5 text-white font-mono" />
+            </div>
+          </div>
+
+          <div class="grid grid-cols-3 gap-2">
+            <div>
+              <label class="text-xs text-slate-400">tRAS</label>
+              <input type="number" id="tRAS" value="36" oninput="calcRam()" class="w-full mt-1 bg-slate-900 border border-slate-700 rounded px-2 py-1.5 text-white font-mono" />
+            </div>
+            <div>
+              <label class="text-xs text-slate-400">tRC</label>
+              <input type="number" id="tRC" value="54" oninput="calcRam()" class="w-full mt-1 bg-slate-900 border border-slate-700 rounded px-2 py-1.5 text-white font-mono" />
+            </div>
+            <div>
+              <label class="text-xs text-slate-400">tRFC (Ciclos)</label>
+              <input type="number" id="tRFC" value="480" oninput="calcRam()" class="w-full mt-1 bg-slate-900 border border-slate-700 rounded px-2 py-1.5 text-white font-mono" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- RAM & WHEA Outputs -->
+      <div class="card p-5 lg:col-span-7 flex flex-col justify-between space-y-4">
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+          <div class="bg-[#0c1018] p-3 rounded-lg border border-slate-800">
+            <p class="text-xs text-slate-400">Latência CAS Real</p>
+            <p class="text-xl font-bold text-emerald-400 font-mono mt-1" id="outCasNs">10.00 ns</p>
+            <p class="text-xs text-slate-500 font-mono mt-0.5" id="outMclk">MCLK: 1600 MHz</p>
+          </div>
+          <div class="bg-[#0c1018] p-3 rounded-lg border border-slate-800">
+            <p class="text-xs text-slate-400">Latência tRFC</p>
+            <p class="text-xl font-bold text-sky-400 font-mono mt-1" id="outTrfcNs">300.0 ns</p>
+            <p class="text-xs text-slate-500 font-mono mt-0.5">Refresh Cycle</p>
+          </div>
+          <div class="bg-[#0c1018] p-3 rounded-lg border border-slate-800">
+            <p class="text-xs text-slate-400">Banda Dual-Channel</p>
+            <p class="text-xl font-bold text-purple-400 font-mono mt-1" id="outBw">51.2 GB/s</p>
+            <p class="text-xs text-slate-500 font-mono mt-0.5">Pico Teórico</p>
+          </div>
+          <div class="bg-[#0c1018] p-3 rounded-lg border border-slate-800">
+            <p class="text-xs text-slate-400">Sincronia Fabric</p>
+            <p class="text-sm font-bold text-emerald-400 font-mono mt-1" id="outSync">1:1:1 Síncrono</p>
+            <p class="text-xs text-slate-500 font-mono mt-0.5" id="outSyncDesc">Sem penalidade</p>
+          </div>
+        </div>
+
+        <!-- Subtiming Validation & WHEA Decoder -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="bg-[#0c1018] p-3.5 rounded-lg border border-slate-800 space-y-1.5 text-xs font-mono" id="subtimingRules">
+            <!-- Populated by JS -->
+          </div>
+          <div class="bg-[#0c1018] p-3.5 rounded-lg border border-slate-800 space-y-2">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-bold text-amber-400 uppercase font-mono">Decodificador WHEA-Logger (Event ID 18)</span>
+              <span class="text-xs text-slate-500 font-mono">APIC ID → Core</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <label class="text-xs text-slate-400">Processor APIC ID:</label>
+              <input type="number" min="0" max="31" id="apicIdInput" value="6" oninput="decodeApic()" class="w-20 bg-slate-900 border border-slate-700 rounded px-2 py-1 text-white font-mono text-xs" />
+              <select id="smtMode" onchange="decodeApic()" class="bg-slate-900 border border-slate-700 rounded px-2 py-1 text-white font-mono text-xs">
+                <option value="1" selected>SMT Ativo (2T/Core)</option>
+                <option value="0">SMT Desativado</option>
+              </select>
+            </div>
+            <div class="p-2 rounded bg-red-950/40 border border-red-800/50 text-xs font-mono text-red-300" id="wheaOutput">
+              Falha no Core Físico #3 (CCD0, Thread 0). Reduza o Curve Optimizer em +3 a +5 counts nesse núcleo.
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Clock Stretching & GPU Hotspot Charts -->
+    <section class="card p-5 space-y-5">
+      <div class="border-b border-slate-800 pb-3 flex flex-col md:flex-row md:items-center justify-between gap-2">
+        <div>
+          <h2 class="text-lg font-bold text-white">2. Diagnóstico HWiNFO64: Clock Stretching por Núcleo (Ryzen) & Delta Térmico Radeon RDNA</h2>
+          <p class="text-xs text-slate-400">Comparação entre Clock Solicitado (Perf/VID) vs. Effective Clock Real sob carga AVX2 e telemetria térmica GPU Edge vs. Hotspot</p>
+        </div>
+        <div class="flex gap-2">
+          <button onclick="setStretchScenario('healthy')" id="btnHealthy" class="px-3 py-1.5 text-xs font-semibold rounded bg-emerald-600 text-white">Undervolt Estável (Sem Stretching)</button>
+          <button onclick="setStretchScenario('stretched')" id="btnStretched" class="px-3 py-1.5 text-xs font-semibold rounded bg-slate-800 text-slate-300 hover:bg-slate-700">CO Excessivo (Clock Stretching no Core 3 e 5)</button>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div class="bg-[#0c1018] p-4 rounded-lg border border-slate-800">
+          <h3 class="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-3">Ryzen 8-Core: Core Clock vs. Effective Clock (MHz)</h3>
+          <canvas id="clockChart" height="190"></canvas>
+        </div>
+        <div class="bg-[#0c1018] p-4 rounded-lg border border-slate-800">
+          <h3 class="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-3">Radeon RDNA: GPU Edge vs. Junction (Hotspot °C)</h3>
+          <canvas id="gpuTempChart" height="190"></canvas>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    function setRamPreset(gen) {
+      document.getElementById('ramGen').value = gen;
+      if (gen === 'ddr4') {
+        document.getElementById('ramMts').value = 3200;
+        document.getElementById('ramFclk').value = 1600;
+        document.getElementById('tCL').value = 16;
+        document.getElementById('tRCD').value = 18;
+        document.getElementById('tRP').value = 18;
+        document.getElementById('tRAS').value = 36;
+        document.getElementById('tRC').value = 54;
+        document.getElementById('tRFC').value = 480;
+      } else {
+        document.getElementById('ramMts').value = 6000;
+        document.getElementById('ramFclk').value = 2000;
+        document.getElementById('tCL').value = 30;
+        document.getElementById('tRCD').value = 38;
+        document.getElementById('tRP').value = 38;
+        document.getElementById('tRAS').value = 76;
+        document.getElementById('tRC').value = 114;
+        document.getElementById('tRFC').value = 500;
+      }
+      calcRam();
+    }
+
+    function calcRam() {
+      const gen = document.getElementById('ramGen').value;
+      const mts = parseFloat(document.getElementById('ramMts').value) || 3200;
+      const fclk = parseFloat(document.getElementById('ramFclk').value) || 1600;
+      const tcl = parseInt(document.getElementById('tCL').value) || 16;
+      const trcd = parseInt(document.getElementById('tRCD').value) || 18;
+      const trp = parseInt(document.getElementById('tRP').value) || 18;
+      const tras = parseInt(document.getElementById('tRAS').value) || 36;
+      const trc = parseInt(document.getElementById('tRC').value) || 54;
+      const trfc = parseInt(document.getElementById('tRFC').value) || 480;
+
+      const mclk = mts / 2;
+      const casNs = (tcl * 2000) / mts;
+      const trfcNs = (trfc * 2000) / mts;
+      const bwGbs = (mts * 8 * 2) / 1000;
+
+      document.getElementById('outCasNs').textContent = casNs.toFixed(2) + ' ns';
+      document.getElementById('outMclk').textContent = `MCLK: ${mclk.toFixed(0)} MHz`;
+      document.getElementById('outTrfcNs').textContent = trfcNs.toFixed(1) + ' ns';
+      document.getElementById('outBw').textContent = bwGbs.toFixed(1) + ' GB/s';
+
+      const syncEl = document.getElementById('outSync');
+      const syncDesc = document.getElementById('outSyncDesc');
+      if (gen === 'ddr4') {
+        if (Math.abs(mclk - fclk) < 5) {
+          syncEl.textContent = '1:1:1 Síncrono';
+          syncEl.className = 'text-sm font-bold text-emerald-400 font-mono mt-1';
+          syncDesc.textContent = 'MCLK = UCLK = FCLK';
+        } else {
+          syncEl.textContent = 'Assíncrono (2:1)';
+          syncEl.className = 'text-sm font-bold text-amber-400 font-mono mt-1';
+          syncDesc.textContent = 'Penalidade +6~9 ns';
+        }
+      } else {
+        if (mts <= 6400) {
+          syncEl.textContent = 'UCLK = MCLK (1:1)';
+          syncEl.className = 'text-sm font-bold text-emerald-400 font-mono mt-1';
+          syncDesc.textContent = `FCLK ${fclk} MHz Ideal`;
+        } else {
+          syncEl.textContent = 'UCLK = MCLK/2';
+          syncEl.className = 'text-sm font-bold text-amber-400 font-mono mt-1';
+          syncDesc.textContent = 'Modo 1:2 acima de 6400';
+        }
+      }
+
+      const minTras = tcl + trcd;
+      const idealTrc = trp + tras;
+      const rulesHtml = `
+        <div class="font-bold text-slate-300 mb-1">Auditoria de Regras de Subtimings:</div>
+        <div class="${tras >= minTras ? 'text-emerald-400' : 'text-amber-400'}">• tRAS (${tras}) >= tCL + tRCD (${minTras}): ${tras >= minTras ? 'OK' : 'Agressivo (Tight)'}</div>
+        <div class="${trc >= idealTrc ? 'text-emerald-400' : 'text-red-400'}">• tRC (${trc}) >= tRP + tRAS (${idealTrc}): ${trc >= idealTrc ? 'OK (Estável)' : 'Risco de corrupção! Suba tRC'}</div>
+        <div class="${trfcNs >= 130 ? 'text-emerald-400' : 'text-amber-400'}">• tRFC (${trfcNs.toFixed(0)} ns): ${trfcNs < 160 ? 'B-Die / A-Die Extremo' : 'Seguro p/ Uso Diário'}</div>
+      `;
+      document.getElementById('subtimingRules').innerHTML = rulesHtml;
+    }
+
+    function decodeApic() {
+      const apic = parseInt(document.getElementById('apicIdInput').value) || 0;
+      const smt = parseInt(document.getElementById('smtMode').value) === 1;
+      const physCore = smt ? Math.floor(apic / 2) : apic;
+      const thread = smt ? (apic % 2) : 0;
+      const ccd = physCore < 8 ? 0 : 1;
+      document.getElementById('wheaOutput').textContent =
+        `APIC ID ${apic} → Core Físico #${physCore} (CCD${ccd}, Thread Lógica ${thread}). Reduza o offset negativo do Curve Optimizer nesse núcleo em 3 a 5 pontos na BIOS.`;
+    }
+
+    let clockChart, gpuTempChart;
+    function initCharts() {
+      const cores = ['Core 0', 'Core 1', 'Core 2', 'Core 3', 'Core 4', 'Core 5', 'Core 6', 'Core 7'];
+      const ctxClock = document.getElementById('clockChart').getContext('2d');
+      clockChart = new Chart(ctxClock, {
+        type: 'bar',
+        data: {
+          labels: cores,
+          datasets: [
+            { label: 'Core Clock Solicitado (MHz)', data: [4650, 4650, 4650, 4650, 4650, 4650, 4650, 4650], backgroundColor: '#3b82f6', borderRadius: 4 },
+            { label: 'Effective Clock Real (MHz)', data: [4642, 4645, 4639, 4641, 4640, 4644, 4638, 4641], backgroundColor: '#10b981', borderRadius: 4 }
+          ]
+        },
+        options: {
+          responsive: true,
+          plugins: { legend: { labels: { color: '#cbd5e1', font: { size: 11 } } } },
+          scales: {
+            x: { ticks: { color: '#94a3b8' }, grid: { color: '#1e293b' } },
+            y: { min: 4300, max: 4750, ticks: { color: '#94a3b8' }, grid: { color: '#1e293b' } }
+          }
+        }
+      });
+
+      const ctxGpu = document.getElementById('gpuTempChart').getContext('2d');
+      gpuTempChart = new Chart(ctxGpu, {
+        type: 'line',
+        data: {
+          labels: ['0s', '30s', '60s', '90s', '120s', '150s', '180s', '210s'],
+          datasets: [
+            { label: 'GPU Hotspot / Junction (°C)', data: [45, 74, 82, 85, 86, 86, 87, 86], borderColor: '#ef4444', tension: 0.3, borderWidth: 2.5 },
+            { label: 'GPU Edge Temp (°C)', data: [40, 61, 66, 68, 69, 69, 70, 69], borderColor: '#38bdf8', tension: 0.3, borderWidth: 2.5 }
+          ]
+        },
+        options: {
+          responsive: true,
+          plugins: { legend: { labels: { color: '#cbd5e1', font: { size: 11 } } } },
+          scales: {
+            x: { ticks: { color: '#94a3b8' }, grid: { color: '#1e293b' } },
+            y: { min: 35, max: 110, ticks: { color: '#94a3b8' }, grid: { color: '#1e293b' } }
+          }
+        }
+      });
+    }
+
+    function setStretchScenario(mode) {
+      document.getElementById('btnHealthy').className = mode === 'healthy'
+        ? 'px-3 py-1.5 text-xs font-semibold rounded bg-emerald-600 text-white'
+        : 'px-3 py-1.5 text-xs font-semibold rounded bg-slate-800 text-slate-300 hover:bg-slate-700';
+      document.getElementById('btnStretched').className = mode === 'stretched'
+        ? 'px-3 py-1.5 text-xs font-semibold rounded bg-red-600 text-white'
+        : 'px-3 py-1.5 text-xs font-semibold rounded bg-slate-800 text-slate-300 hover:bg-slate-700';
+
+      if (mode === 'healthy') {
+        clockChart.data.datasets[1].data = [4642, 4645, 4639, 4641, 4640, 4644, 4638, 4641];
+        clockChart.data.datasets[1].backgroundColor = '#10b981';
+      } else {
+        clockChart.data.datasets[1].data = [4640, 4642, 4635, 4415, 4638, 4390, 4636, 4640];
+        clockChart.data.datasets[1].backgroundColor = ['#10b981','#10b981','#10b981','#ef4444','#10b981','#ef4444','#10b981','#10b981'];
+      }
+      clockChart.update();
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      calcRam();
+      decodeApic();
+      initCharts();
+    });
+  </script>
+</body>
+</html>
